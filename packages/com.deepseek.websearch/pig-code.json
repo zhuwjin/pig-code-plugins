@@ -4,14 +4,6 @@
     "zh-CN": "使用 DeepSeek 搜索互联网，并返回适合模型阅读的结构化摘要。",
     "en": "Search the web with DeepSeek and return model-ready structured summaries."
   },
-  "pages": [{
-    "id": "account",
-    "entry": "main.js",
-    "title": { "zh-CN": "DeepSeek 搜索", "en": "DeepSeek Search" },
-    "kind": "settings",
-    "icon": "search",
-    "order": 422
-  }],
   "credentials": [{
     "kind": "owned",
     "id": "deepseek",
@@ -31,7 +23,7 @@
         },
         "max_results": {
           "type": "integer",
-          "description": "Number of results to return (default 10, max 10)"
+          "description": "Number of results to return (defaults to the plugin configuration, max 50)"
         }
       },
       "required": ["query"]
@@ -43,5 +35,15 @@
     "methods": ["POST"],
     "credentials": ["deepseek"]
   }],
-  "actions": ["provide_tools", "http", "manage_own_secrets"]
+  "config": {
+    "items": [{
+      "key": "max_results",
+      "description": {
+        "zh-CN": "每次搜索默认返回的结果数量，1～50 条。",
+        "en": "Default number of results per search, from 1 to 50."
+      },
+      "default": 10
+    }]
+  },
+  "actions": ["provide_tools", "http", "manage_own_secrets", "read_settings", "read_config", "write_config"]
 }

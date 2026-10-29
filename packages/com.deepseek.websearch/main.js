@@ -10,9 +10,15 @@ import {
   clear_secret,
   request_http,
   mono_font_family,
+  snapshot,
+  dispatch,
 } from "pig-code";
 
 const MAX_SEARCH_OUTPUT = 30 * 1024;
+const TEXT = {
+  en: { maxResults: "Max results" },
+  "zh-CN": { maxResults: "返回数量" },
+};
 
 function utf8Length(text) {
   let length = 0;
@@ -38,6 +44,17 @@ function formatHits(query, hits) {
   return output;
 }
 
+async function readMaxResults() {
+  const response = await dispatch({ kind: "read_config", data: { path: "max_results" } });
+  if (!response.ok) {
+    throw new Error(response.error?.detail || "Failed to read the result count");
+  }
+  if (!Number.isInteger(response.value) || response.value < 1 || response.value > 50) {
+    throw new Error(`Unsupported result count: ${response.value}`);
+  }
+  return response.value;
+}
+
 async function executeTool(call) {
   if (call.tool !== "DeepSeekSearch") {
     throw new Error(`Unsupported tool: ${call.tool}`);
@@ -52,10 +69,10 @@ async function executeTool(call) {
   }
   const requested = Number.isInteger(args.max_results) && args.max_results >= 0
     ? args.max_results
-    : 10;
-  const count = Math.max(1, Math.min(10, requested));
+    : await readMaxResults();
+  const count = Math.max(1, Math.min(50, requested));
   if (!secret_status(["deepseek"]).deepseek) {
-    throw new Error("DeepSeek Search is not configured: save an API key in Settings first.");
+    throw new Error("DeepSeek Search is not configured: save an API key in the plugin details first.");
   }
   const response = await request_http({
     origin: "deepseek",
@@ -89,10 +106,29 @@ async function executeTool(call) {
     : formatHits(query, hits);
 }
 
+function countChoice(count, page, cx) {
+  const colors = cx.theme().colors;
+  const selected = page.maxResults === count;
+  return Button.new(`deepseek-count-${count}`)
+    .h(28)
+    .px(10)
+    .items_center()
+    .justify_center()
+    .rounded(6)
+    .border(1)
+    .border_color(selected ? colors.primary : colors.border)
+    .text_sm()
+    .text_color(selected ? colors.primary : colors.foreground)
+    .on_click((_event, cx) => page.saveMaxResults(count, cx))
+    .child(String(count));
+}
+
 export default class DeepSeekPage extends View {
   init(_props, cx) {
     this.data = null;
     this.error = null;
+    this.locale = "en";
+    this.maxResults = 10;
     this.deepseek = InputState.new();
     this.refresh(cx);
     this.toolWorker = cx.spawn(async (cx) => {
@@ -126,7 +162,33 @@ export default class DeepSeekPage extends View {
     this.error = null;
     cx.spawn(async (cx) => {
       try {
-        this.data = secret_status(["deepseek"]);
+        const data = secret_status(["deepseek"]);
+        const services = await snapshot(null);
+        if (!services.ok) {
+          throw new Error(services.error?.detail || "Failed to read plugin services");
+        }
+        const maxResults = await readMaxResults();
+        this.data = data;
+        this.locale = services.value?.locale || "en";
+        this.maxResults = maxResults;
+      } catch (error) {
+        this.error = String(error);
+      }
+      cx.notify();
+    });
+  }
+
+  saveMaxResults(count, cx) {
+    cx.spawn(async (cx) => {
+      try {
+        const result = await dispatch({
+          kind: "write_config",
+          data: { path: "max_results", value: count },
+        });
+        if (!result.ok) {
+          throw new Error(result.error?.detail || "Failed to save the result count");
+        }
+        this.maxResults = count;
       } catch (error) {
         this.error = String(error);
       }
@@ -181,6 +243,7 @@ export default class DeepSeekPage extends View {
       return page.child(div().text_sm().text_color(colors.muted_foreground).child("…"));
     }
     const configured = this.data.deepseek;
+    const labels = TEXT[this.locale] || TEXT.en;
     return page
       .child(
         h_flex().w_full().justify_end().child(
@@ -202,10 +265,22 @@ export default class DeepSeekPage extends View {
         v_flex()
           .w_full()
           .gap(8)
-          .p(12)
-          .rounded(8)
-          .border(1)
-          .border_color(colors.border)
+          .child(div().text_sm().font_semibold().child(labels.maxResults))
+          .child(
+            h_flex()
+              .w_full()
+              .items_center()
+              .gap(8)
+              .child(countChoice(5, this, cx))
+              .child(countChoice(10, this, cx))
+              .child(countChoice(20, this, cx))
+              .child(countChoice(50, this, cx)),
+          ),
+      )
+      .child(
+        v_flex()
+          .w_full()
+          .gap(8)
           .child(
             h_flex()
               .w_full()

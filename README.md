@@ -12,6 +12,6 @@ Pig Code downloads files into a staging directory, verifies every file and the w
 
 ## DeepSeek Search
 
-`com.deepseek.websearch` provides the `DeepSeekSearch` tool and a settings page for a package-owned DeepSeek API key. It calls `POST https://api.deepseek.com/v1/tools/search` with `need_content: false`.
+`com.deepseek.websearch` provides the `DeepSeekSearch` tool. Its package-owned API key and default result count are managed only in the plugin details configuration view; it contributes no standalone settings page. It calls `POST https://api.deepseek.com/v1/tools/search` with `need_content: false`.
 
 API reference: https://api-docs.deepseek.com/zh-cn/api/search

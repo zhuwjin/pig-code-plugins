@@ -4,28 +4,28 @@
     {
       "id": "com.deepseek.websearch",
       "name": "DeepSeek Search",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "directory": "packages/com.deepseek.websearch",
       "description": {
         "zh-CN": "使用 DeepSeek 搜索互联网，并返回适合模型阅读的结构化摘要。",
         "en": "Search the web with DeepSeek and return model-ready structured summaries."
       },
-      "digest": "sha256:64bc1396cf00118cf32dfe62ab9f7bdb86a75b9455bdbeb88b68629332a5854a",
+      "digest": "sha256:edb2afbbdaa7e3a228c136e3bfb97db640dc0b2772fddeb82e6001c7953d2499",
       "files": [
         {
           "path": "gpui-shell.json",
           "size": 138,
-          "sha256": "5ecee666c91d6326ce7d51dac53347573dee71b044a64cd2b808e84653d57f33"
+          "sha256": "b15554b9d83ba44f48089503e70a071947dbc8a70cfdc67ac02999e949022e89"
         },
         {
           "path": "main.js",
-          "size": 8366,
-          "sha256": "2af219467e6f712ec7d00609e9e001e54f6fb5b36a7542a04fef38c1882b4015"
+          "size": 10714,
+          "sha256": "6402651f8c682909b91c6b79a82ea926b4e13fe2e6726c43d7df41cc94765a83"
         },
         {
           "path": "pig-code.json",
-          "size": 1525,
-          "sha256": "9ec829460770e98b3e92c51695e28e882dd0942925da32a252bf7b9006c28622"
+          "size": 1667,
+          "sha256": "19649e5a76be2b2614b85cb277c30064cb614d671db877209231489c89cb4811"
         }
       ]
     }
