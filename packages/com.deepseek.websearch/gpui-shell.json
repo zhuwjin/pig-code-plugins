@@ -1,0 +1,7 @@
+{
+  "id": "com.deepseek.websearch",
+  "name": "DeepSeek Search",
+  "version": "0.1.0",
+  "shell-version": "0.8.1",
+  "entry": "main.js"
+}

@@ -1,0 +1,47 @@
+{
+  "api_version": 1,
+  "description": {
+    "zh-CN": "使用 DeepSeek 搜索互联网，并返回适合模型阅读的结构化摘要。",
+    "en": "Search the web with DeepSeek and return model-ready structured summaries."
+  },
+  "pages": [{
+    "id": "account",
+    "entry": "main.js",
+    "title": { "zh-CN": "DeepSeek 搜索", "en": "DeepSeek Search" },
+    "kind": "settings",
+    "icon": "search",
+    "order": 422
+  }],
+  "credentials": [{
+    "kind": "owned",
+    "id": "deepseek",
+    "label": "DeepSeek API key",
+    "description": "Used only for DeepSeek web search requests."
+  }],
+  "tools": [{
+    "name": "DeepSeekSearch",
+    "description": "Search the web with DeepSeek. Returns titles, URLs and model-ready summaries for current information, documentation and error investigation. Follow up with FetchURL when the original page is required.",
+    "read_only": true,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search query, 1-128 Unicode characters. Supports site:, -site: and quoted phrases."
+        },
+        "max_results": {
+          "type": "integer",
+          "description": "Number of results to return (default 10, max 10)"
+        }
+      },
+      "required": ["query"]
+    }
+  }],
+  "http": [{
+    "id": "deepseek",
+    "url": "https://api.deepseek.com/v1/tools/search",
+    "methods": ["POST"],
+    "credentials": ["deepseek"]
+  }],
+  "actions": ["provide_tools", "http", "manage_own_secrets"]
+}
